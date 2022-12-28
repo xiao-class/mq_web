@@ -36,6 +36,13 @@ service.interceptors.request.use(config => {
     config.params = {};
     config.url = url;
   }
+  // （解决分页为post请求时）页码拼接到url后面
+  const { pageSize, pageNum } = config.data || {};
+  if (pageSize && pageNum) {
+    config.url = config.url.includes("?")
+      ? `${config.url}&pageNum=${pageNum}&pageSize=${pageSize}`
+      : `${config.url}?pageNum=${pageNum}&pageSize=${pageSize}`;
+  }
   if (!isRepeatSubmit && (config.method === 'post' || config.method === 'put')) {
     const requestObj = {
       url: config.url,
