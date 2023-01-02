@@ -91,7 +91,7 @@
       @pagination="getList"
     />
 
-    <!-- 添加或修改部门对话框 -->
+    <!-- 添加或修改交换机对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="600px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="100px">
         <el-row>
@@ -195,7 +195,6 @@ export default {
     /** 重置按钮操作 */
     resetQuery() {
       this.resetForm("queryForm");
-      this.queryParams.dictType = this.defaultDictType;
       this.handleQuery();
     },
     /** 搜索按钮操作 */
@@ -203,7 +202,7 @@ export default {
       this.queryParams.pageNum = 1;
       this.getList();
     },
-    /** 查询字典数据列表 */
+    /** 查询设备数据列表 */
     getList() {
       this.loading = true;
       exchangeList(this.queryParams).then(response => {
@@ -212,7 +211,7 @@ export default {
         this.loading = false;
       });
     },
-    // 角色状态修改
+    // 交换机状态修改
     handleStatusChange(row) {
       let text = row.status === "1" ? "启用" : "停用";
       this.$modal.confirm('确认要"' + text + '""' + row.exchangeName + '"交换机吗？').then(function () {
@@ -273,6 +272,6 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 
 </style>
