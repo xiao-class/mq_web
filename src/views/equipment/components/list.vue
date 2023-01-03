@@ -87,12 +87,12 @@
           ></el-switch>
         </template>
       </el-table-column>
-      <el-table-column prop="equipmentType" label="设备类型" width="180">
+      <el-table-column prop="equipmentType" label="设备类型" align="center" width="180">
         <template slot-scope="scope">
           <dict-tag :options="dict.type.mqtt_equipment_type" :value="scope.row.equipmentType"/>
         </template>
       </el-table-column>
-      <el-table-column prop="onlineStatus" label="状态" width="120">
+      <el-table-column prop="onlineStatus" label="状态" align="center" width="120">
         <template slot-scope="scope">
           <dict-tag :options="dict.type.mqtt_equipment_online" :value="scope.row.onlineStatus"/>
         </template>
@@ -226,7 +226,15 @@
 
 <script>
 
-import {queryExchangeSelect, addEquipment, queryEquipmentLis} from "@/api/equipment/equipment";
+import {
+  queryExchangeSelect,
+  addEquipment,
+  queryEquipmentLis,
+  queryEquipmentById,
+  editEquipment,
+  editEquipmentStatus,
+  delEquipment
+} from "@/api/equipment/equipment";
 
 export default {
   name: "ComponentsList",
@@ -312,7 +320,7 @@ export default {
     handleStatusChange(row) {
       let text = row.status === "1" ? "启用" : "停用";
       this.$modal.confirm('确认要"' + text + '""' + row.equipmentNo + '"设备吗？').then(function () {
-        return editExchangeStatus(row.roleId, row.status);
+        return editEquipmentStatus(row.roleId, row.status);
       }).then(() => {
         this.$modal.msgSuccess(text + "成功");
       }).catch(function () {
@@ -336,12 +344,25 @@ export default {
       })
     },
     /*修改设备*/
-    handleUpdate() {
-
+    handleUpdate(row) {
+      this.title = '修改设备信息'
+      // 获取交换机下拉框
+      this.queryExchangeList()
+      // 获取详细信息
+      queryEquipmentById(row.id).then(resp => {
+        this.form = resp.data
+        this.open = true
+      })
     },
     /*删除设备*/
-    handleDelete() {
-
+    handleDelete(row) {
+      this.$modal.confirm('是否确认删除设备编号为"' + row.equipmentNo + '"的数据项？').then(function () {
+        return delEquipment(row.id);
+      }).then(() => {
+        this.getList();
+        this.$modal.msgSuccess("删除成功");
+      }).catch(() => {
+      });
     },
     /*获取交换机下拉框列表*/
     queryExchangeList() {
@@ -355,6 +376,11 @@ export default {
         if (valid) {
           if (this.form.id !== undefined) {
             // 说明为修改
+            editEquipment(this.form).then(resp => {
+              this.$modal.msgSuccess("修改成功");
+              this.open = false;
+              this.getList();
+            })
           } else {
             // 说明为添加
             addEquipment(this.form).then(resp => {
